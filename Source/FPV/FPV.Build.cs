@@ -1,5 +1,8 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+//  hidparse.lib
 
+
+using System;
+using System.IO;
 using UnrealBuildTool;
 
 public class FPV : ModuleRules
@@ -12,12 +15,9 @@ public class FPV : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Add any import libraries or static libraries
+        PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "lib", "hid.lib"));
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+
+    }
 }
