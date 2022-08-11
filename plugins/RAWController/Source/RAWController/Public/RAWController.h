@@ -1,7 +1,38 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
+#pragma once
+
+
+#include "CoreMinimal.h"
+#include "Modules/ModuleManager.h"
 #include "CoreTypes.h"
 #include "Containers/UnrealString.h"
+#include "Windows/WindowsApplication.h"
+
+
+class FControllerHandeler : public IWindowsMessageHandler
+{
+public:
+	virtual bool ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult) override;
+	FString GetMessageName(uint32 Message);
+};
+
+
+
+class FRAWControllerModule : public IModuleInterface
+{
+public:
+
+	virtual void StartupModule() override;
+	virtual void ShutdownModule() override;
+
+protected:
+	FWindowsApplication* GetApplication() const;
+
+private:
+	FControllerHandeler Handler;
+
+};
 
 
 struct FMessageName
@@ -1019,31 +1050,3 @@ static const FMessageName WindowsMessageNames[] =
 };
 
 
-FString GetMessageName(uint32 Message)
-{
-	// do a binary search over known messages
-	int32 Min = 0;
-	int32 Max = sizeof(WindowsMessageNames) / sizeof(*WindowsMessageNames);
-
-	for (; Min != Max;)
-	{
-		int32 Index = Min + (Max - Min) / 2;
-		auto& MessageName = WindowsMessageNames[Index];
-
-		if (MessageName.Message > Message)
-		{
-			Max = Index;
-		}
-		else if (MessageName.Message < Message)
-		{
-			Min = Index + 1;
-		}
-		else
-		{
-			return MessageName.Name;
-		}
-	}
-
-	// unknown message
-	return FString::Printf(TEXT("%i"), Message);
-}

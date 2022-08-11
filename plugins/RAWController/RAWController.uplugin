@@ -1,0 +1,26 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "RAW Input Controller",
+	"Description": "Raw Input controller uses Microsoft raw input API to provide stable and robust access to any HID such as mouses, keyboards, joysticks. ",
+	"Category": "Inputs",
+	"CreatedBy": "Bryan Howard",
+	"EnabledByDefault": true,
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "RAWController",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [ "Win32", "Win64" ]
+		}
+	]
+}
