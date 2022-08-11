@@ -2,7 +2,16 @@
 
 #include "RAWController.h"
 
+#include "Windows/MinWindows.h"
+#include <Dbt.h>
+#include <hidsdi.h>
+#include <hidpi.h>
+
 #define LOCTEXT_NAMESPACE "FRAWControllerModule"
+
+#define MAX_BUTTONS		128
+
+
 
 void FRAWControllerModule::StartupModule()
 {
@@ -11,6 +20,8 @@ void FRAWControllerModule::StartupModule()
 
 	if (Application != nullptr)
 	{
+
+		// Add the Handeler
 		Application->AddMessageHandler(Handler);
 	}
 }
@@ -40,43 +51,106 @@ FWindowsApplication* FRAWControllerModule::GetApplication() const
 }
 
 
-
 bool FControllerHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult)
 {
-	// log out some details for the received message
-	GLog->Logf(TEXT("RawController: hwnd = %i, msg = %s, wParam = %i, lParam = %i"), Hwnd, *GetMessageName(Message), WParam, LParam);
+	if (RegisteredDevice == false) {
+		GLog->Logf(TEXT("Register for joystick devices"));
+		// Register for joystick devices
+		RAWINPUTDEVICE rid[2] = {};
 
-	// we did not handle this message, so make sure it gets passed on to other handlers
-	return false;
-}
+		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		rid[0].usUsage = HID_USAGE_GENERIC_GAMEPAD;	// gamepad
+		rid[0].dwFlags = RIDEV_INPUTSINK; // Recieve messages when in background.
+		rid[0].hwndTarget = Hwnd;
 
-FString FControllerHandeler::GetMessageName(uint32 Message)
-{
-	// do a binary search over known messages
-	int32 Min = 0;
-	int32 Max = sizeof(WindowsMessageNames) / sizeof(*WindowsMessageNames);
 
-	for (; Min != Max;)
+		rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		rid[1].usUsage = HID_USAGE_GENERIC_JOYSTICK;	// Gamepad - e.g. XBox 360 or XBox One controllers
+		rid[1].dwFlags = RIDEV_INPUTSINK; // Recieve messages when in background.
+		rid[1].hwndTarget = Hwnd;
+
+		if (RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE)))
+		{
+			GLog->Logf(TEXT("Register for joystick devices"));
+			RegisteredDevice = true;
+		}
+		else {
+			GLog->Logf(TEXT("Register for joystick devices FAILED"));
+			RegisteredDevice = false;
+		}
+		return false;
+	}
+
+
+	switch (Message)
 	{
-		int32 Index = Min + (Max - Min) / 2;
-		auto& MessageName = WindowsMessageNames[Index];
+	case WM_INPUT:
+	{
+		// Get the buffer size
+		UINT bufferSize = 0;
+		GetRawInputData((HRAWINPUT)LParam, RID_INPUT, NULL, &bufferSize, sizeof(RAWINPUTHEADER));
 
-		if (MessageName.Message > Message)
-		{
-			Max = Index;
-		}
-		else if (MessageName.Message < Message)
-		{
-			Min = Index + 1;
-		}
-		else
-		{
-			return MessageName.Name;
+		// Get the input size
+		RAWINPUT* input = (RAWINPUT*)malloc(bufferSize);
+		bool gotInput = GetRawInputData((HRAWINPUT)LParam, RID_INPUT, input, &bufferSize, sizeof(RAWINPUTHEADER)) > 0;
+
+		// If we got input, we parse it
+		if (gotInput) {
+			//GLog->Logf(TEXT("Got Input"));
+			ParseRawInput(input, bufferSize);
+			free(input);
 		}
 	}
 
-	// unknown message
-	return FString::Printf(TEXT("%i"), Message);
+	}
+	return false;
+}
+
+
+void FControllerHandeler::ParseRawInput(RAWINPUT* input, UINT bufferSize)
+{
+	// Get pre parsed data
+	GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, 0, &bufferSize);
+	_HIDP_PREPARSED_DATA* data = (_HIDP_PREPARSED_DATA*)malloc(bufferSize);
+	bool gotPreparsedData = GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, data, &bufferSize) > 0;
+
+	if (gotPreparsedData)
+	{
+		HIDP_CAPS caps;
+		HidP_GetCaps(data, &caps);
+
+		//GLog->Logf(TEXT("Values: "));
+		HIDP_VALUE_CAPS* valueCaps = (HIDP_VALUE_CAPS*)malloc(caps.NumberInputValueCaps * sizeof(HIDP_VALUE_CAPS));
+		HidP_GetValueCaps(HidP_Input, valueCaps, &caps.NumberInputValueCaps, data);
+		for (USHORT i = 0; i < caps.NumberInputValueCaps; ++i)
+		{
+			ULONG value;
+			HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].Range.UsageMin, &value, data, (PCHAR)input->data.hid.bRawData, input->data.hid.dwSizeHid);
+			//GLog->Logf(TEXT("%d:%5d "), i, value);
+			FString Msg = FString::Printf(TEXT("Axis: %d:%5d "), i, value);
+			GEngine->AddOnScreenDebugMessage(i, 0.1f, FColor::Red, Msg);
+		}
+		free(valueCaps);
+
+		//GLog->Logf(TEXT("Buttons: "));
+		HIDP_BUTTON_CAPS* buttonCaps = (HIDP_BUTTON_CAPS*)malloc(caps.NumberInputButtonCaps * sizeof(HIDP_BUTTON_CAPS));
+		HidP_GetButtonCaps(HidP_Input, buttonCaps, &caps.NumberInputButtonCaps, data);
+		for (USHORT i = 0; i < caps.NumberInputButtonCaps; ++i)
+		{
+			ULONG usageCount = buttonCaps->Range.UsageMax - buttonCaps->Range.UsageMin + 1;
+			USAGE* usages = (USAGE*)malloc(sizeof(USAGE) * usageCount);
+			HidP_GetUsages(HidP_Input, buttonCaps[i].UsagePage, 0, usages, &usageCount, data, (PCHAR)input->data.hid.bRawData, input->data.hid.dwSizeHid);
+			for (ULONG usageIndex = 0; usageIndex < usageCount; ++usageIndex) {
+				//printf("%d ", usages[usageIndex]);
+				//GLog->Logf(TEXT("%d"), usages[usageIndex]);
+				FString Msg = FString::Printf(TEXT("Button: %d "), usages[usageIndex]);
+				GEngine->AddOnScreenDebugMessage(8 + i, 0.1f, FColor::Blue, Msg);
+			}
+			free(usages);
+		}
+		free(buttonCaps);
+	}
+	free(data);
 }
 
 

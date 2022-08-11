@@ -1,14 +1,19 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+using System;
+using System.IO;
 using UnrealBuildTool;
+
 
 public class RAWController : ModuleRules
 {
 	public RAWController(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
+
+        PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "lib", "hid.lib"));
+
+        PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
 			}

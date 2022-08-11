@@ -22,10 +22,6 @@
 			]
 		},
 		{
-			"Name": "EnhancedInput",
-			"Enabled": true
-		},
-		{
 			"Name": "WindowsMessageHandlerExample",
 			"Enabled": false
 		}
