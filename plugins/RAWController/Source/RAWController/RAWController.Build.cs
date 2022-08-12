@@ -43,7 +43,9 @@ public class RAWController : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "Core"
+                "Core",
+				"InputDevice",
+				"DeveloperSettings"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

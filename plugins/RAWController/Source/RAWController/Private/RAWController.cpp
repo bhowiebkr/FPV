@@ -1,7 +1,19 @@
 #include "RAWController.h"
+#include "IInputDeviceModule.h"
+#include "IInputDevice.h"
 
 
-void FRAWControllerModule::StartupModule()
+
+
+#define LOCTEXT_NAMESPACE "FRAWControllerPlugin"
+
+
+TSharedPtr<class IInputDevice> FRAWControllerPlugin::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+{
+	return TSharedPtr<class IInputDevice>();
+}
+
+void FRAWControllerPlugin::StartupModule()
 {
 	// register our handler
 	FWindowsApplication* Application = GetApplication();
@@ -14,7 +26,7 @@ void FRAWControllerModule::StartupModule()
 	}
 }
 
-void FRAWControllerModule::ShutdownModule()
+void FRAWControllerPlugin::ShutdownModule()
 {
 	// unregister our handler
 	FWindowsApplication* Application = GetApplication();
@@ -25,7 +37,7 @@ void FRAWControllerModule::ShutdownModule()
 	}
 }
 
-FWindowsApplication* FRAWControllerModule::GetApplication() const
+FWindowsApplication* FRAWControllerPlugin::GetApplication() const
 {
 	if (!FSlateApplication::IsInitialized())
 	{
@@ -39,4 +51,12 @@ FWindowsApplication* FRAWControllerModule::GetApplication() const
 }
 
 
-IMPLEMENT_MODULE(FRAWControllerModule, RAWController)
+IRAWControllerInput::IRAWControllerInput(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+{
+}
+
+
+
+IMPLEMENT_MODULE(FRAWControllerPlugin, RAWController)
+
+#undef LOCTEXT_NAMESPACE
