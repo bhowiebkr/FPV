@@ -15,13 +15,13 @@ bool FControllerHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WPara
 		RAWINPUTDEVICE rid[2] = {};
 
 		rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
-		rid[0].usUsage = HID_USAGE_GENERIC_GAMEPAD;	// gamepad
+		rid[0].usUsage = HID_USAGE_GENERIC_GAMEPAD;	// Gamepad - e.g. XBox 360 or XBox One controllers
 		rid[0].dwFlags = RIDEV_INPUTSINK; // Recieve messages when in background.
 		rid[0].hwndTarget = Hwnd;
 
 
 		rid[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
-		rid[1].usUsage = HID_USAGE_GENERIC_JOYSTICK;	// Gamepad - e.g. XBox 360 or XBox One controllers
+		rid[1].usUsage = HID_USAGE_GENERIC_JOYSTICK; // Joystick, RC Controller, etc.	
 		rid[1].dwFlags = RIDEV_INPUTSINK; // Recieve messages when in background.
 		rid[1].hwndTarget = Hwnd;
 
