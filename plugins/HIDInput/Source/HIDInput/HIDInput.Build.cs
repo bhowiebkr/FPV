@@ -5,9 +5,9 @@ using System.IO;
 using UnrealBuildTool;
 
 
-public class RAWController : ModuleRules
+public class HIDInput : ModuleRules
 {
-	public RAWController(ReadOnlyTargetRules Target) : base(Target)
+	public HIDInput(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 

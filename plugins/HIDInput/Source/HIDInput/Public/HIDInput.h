@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Modules/ModuleManager.h"
-#include "HIDHandeler.h"
+#include "HIDInputHandeler.h"
 #include "IInputDeviceModule.h"
 #include "IInputDevice.h"
+#include "HIDInputDevice.h"
 #include "GenericPlatform/GenericApplicationMessageHandler.h"
 
 
@@ -20,17 +21,15 @@
 * The public interface to this module. In most cases, this interface is only public to sibling modules
 * within this plugin. 
 */
-class FRAWControllerPlugin : public IInputDeviceModule
+class FHIDInputPlugin: public IInputDeviceModule
 {
 	
 	// This function is called by *Application.cpp after startup to instantiate the modules InputDevice
 	virtual TSharedPtr< class IInputDevice > CreateInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler) override;
 
-	TSharedPtr< class IRAWControllerInput > RawInputDevice;
+	TSharedPtr< class IHIDInput> RawInputDevice;
 
 public:
-
-	TSharedPtr< class IRAWControllerInput >& GetRawInputDevice() { return RawInputDevice; }
 
 
 	// Startup/Shutdown the modules. 
@@ -39,9 +38,9 @@ public:
 	
 	/* Loads the module and returns it. If it's already loaded it returns the exisinting loaded one. 
 	*/
-	static inline FRAWControllerPlugin& Get()
+	static inline FHIDInputPlugin& Get()
 	{
-		return FModuleManager::LoadModuleChecked<FRAWControllerPlugin>("RAWController");
+		return FModuleManager::LoadModuleChecked<FHIDInputPlugin>("HIDInput");
 	}
 
 	/*
@@ -50,7 +49,7 @@ public:
 	*/
 	static inline bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded("RAWController");
+		return FModuleManager::Get().IsModuleLoaded("HIDInputs");
 	}
 
 protected:
@@ -58,6 +57,6 @@ protected:
 	FWindowsApplication* GetApplication() const;
 
 private:
-	FControllerHandeler Handler;
+	FHIDHandeler Handler;
 
 };

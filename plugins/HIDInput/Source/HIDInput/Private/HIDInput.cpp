@@ -1,18 +1,20 @@
+#include "HIDInput.h"
+
 #include "Templates/SharedPointer.h"
-#include "RAWController.h"
+#include "HIDInputDevice.h"
 #include "IInputDeviceModule.h"
 #include "IInputDevice.h"
 
-#define LOCTEXT_NAMESPACE "FRAWControllerPlugin"
+#define LOCTEXT_NAMESPACE "FHIDInputPlugin"
 
 
 // This function is called by *Application.cpp after startup to instantiate the modules InputDevice
-inline TSharedPtr<class IInputDevice> FRAWControllerPlugin::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+inline TSharedPtr<class IInputDevice> FHIDInputPlugin::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
 {
 	return TSharedPtr<class IInputDevice>();
 }
 
-void FRAWControllerPlugin::StartupModule()
+void FHIDInputPlugin::StartupModule()
 {
 	// register our handler
 	FWindowsApplication* Application = GetApplication();
@@ -25,7 +27,7 @@ void FRAWControllerPlugin::StartupModule()
 	}
 }
 
-FWindowsApplication* FRAWControllerPlugin::GetApplication() const
+FWindowsApplication* FHIDInputPlugin::GetApplication() const
 {
 	if (!FSlateApplication::IsInitialized())
 	{
@@ -38,21 +40,9 @@ FWindowsApplication* FRAWControllerPlugin::GetApplication() const
 	return (FWindowsApplication*)FSlateApplication::Get().GetPlatformApplication().Get();
 }
 
-IMPLEMENT_MODULE(FRAWControllerPlugin, RAWController)
+IMPLEMENT_MODULE(FHIDInputPlugin, RAWController)
 
-/*
-TSharedPtr< class IInputDevice > FKinectV2Plugin::CreateCustomHardwareInput()
-{
-TSharedPtr< FKinectV2CHI > KinectV2CHI(new FKinectV2CHI());
-return KinectV2CHI;
-}
-*/
-TSharedPtr< class IInputDevice > FRAWControllerPlugin::CreateInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler)
-{
 
-	return MakeShareable(new RAWControllerDevice(InMessageHandler));
-
-}
 
 
 #undef LOCTEXT_NAMESPACE

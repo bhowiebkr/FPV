@@ -1,4 +1,4 @@
-#include "HIDHandeler.h"
+#include "HIDInputHandeler.h"
 
 #include "Windows/MinWindows.h"
 
@@ -7,7 +7,7 @@
 #include <hidpi.h>
 
 
-bool FControllerHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult)
+bool FHIDHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPARAM LParam, int32& OutResult)
 {
 	if (RegisteredDevice == false) {
 		GLog->Logf(TEXT("Register for joystick devices"));
@@ -64,7 +64,7 @@ bool FControllerHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WPara
 
 
 
-void FControllerHandeler::ParseRawInput(RAWINPUT* input, UINT bufferSize)
+void FHIDHandeler::ParseRawInput(RAWINPUT* input, UINT bufferSize)
 {
 	// Get pre parsed data
 	GetRawInputDeviceInfo(input->header.hDevice, RIDI_PREPARSEDDATA, 0, &bufferSize);
