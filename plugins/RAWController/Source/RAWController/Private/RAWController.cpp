@@ -1,32 +1,19 @@
+#include "Templates/SharedPointer.h"
 #include "RAWController.h"
 #include "IInputDeviceModule.h"
 #include "IInputDevice.h"
 
 #define LOCTEXT_NAMESPACE "FRAWControllerPlugin"
 
-const FGamepadKeyNames::Type FRawInputKeyNames::HIDController_Axis1("HIDController_Axis1");
-const FKey FRawInputKeys::HIDController_Axis1(FRawInputKeyNames::HIDController_Axis1);
 
-
-TSharedPtr<class IInputDevice> FRAWControllerPlugin::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+// This function is called by *Application.cpp after startup to instantiate the modules InputDevice
+inline TSharedPtr<class IInputDevice> FRAWControllerPlugin::CreateInputDevice(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
 {
 	return TSharedPtr<class IInputDevice>();
-
-
 }
 
 void FRAWControllerPlugin::StartupModule()
 {
-	const FName NAME_GenericUSBController(TEXT("HIDController"));
-
-	// Generic USB Controllers (Wheel, Flightstick etc.)
-	EKeys::AddMenuCategoryDisplayInfo(NAME_GenericUSBController, LOCTEXT("HIDControllerSubCateogry", "HIDController"), TEXT("GraphEditor.KeyEvent_16x"));
-
-
-	EKeys::AddKey(FKeyDetails(FRawInputKeys::HIDController_Axis1, LOCTEXT("GenericUSBController_Axis1", "GenericUSBController Axis 1"), FKeyDetails::GamepadKey, NAME_GenericUSBController));
-
-
-
 	// register our handler
 	FWindowsApplication* Application = GetApplication();
 
@@ -35,17 +22,6 @@ void FRAWControllerPlugin::StartupModule()
 
 		// Add the Handeler
 		Application->AddMessageHandler(Handler);
-	}
-}
-
-void FRAWControllerPlugin::ShutdownModule()
-{
-	// unregister our handler
-	FWindowsApplication* Application = GetApplication();
-
-	if (Application != nullptr)
-	{
-		Application->RemoveMessageHandler(Handler);
 	}
 }
 
@@ -62,13 +38,21 @@ FWindowsApplication* FRAWControllerPlugin::GetApplication() const
 	return (FWindowsApplication*)FSlateApplication::Get().GetPlatformApplication().Get();
 }
 
+IMPLEMENT_MODULE(FRAWControllerPlugin, RAWController)
 
-IRAWControllerInput::IRAWControllerInput(const TSharedRef<FGenericApplicationMessageHandler>& InMessageHandler)
+/*
+TSharedPtr< class IInputDevice > FKinectV2Plugin::CreateCustomHardwareInput()
 {
+TSharedPtr< FKinectV2CHI > KinectV2CHI(new FKinectV2CHI());
+return KinectV2CHI;
+}
+*/
+TSharedPtr< class IInputDevice > FRAWControllerPlugin::CreateInputDevice(const TSharedRef< FGenericApplicationMessageHandler >& InMessageHandler)
+{
+
+	return MakeShareable(new RAWControllerDevice(InMessageHandler));
+
 }
 
-
-
-IMPLEMENT_MODULE(FRAWControllerPlugin, RAWController)
 
 #undef LOCTEXT_NAMESPACE
