@@ -1,14 +1,12 @@
 
 #include "HIDInputLibrary.h"
+#include "HIDInputEnum.h"
 
 
-/*
+//const FKey EKeysAxis1::MyoAccelerationX("Axis1");
 
-TArray<FRegisteredDeviceInfo> URAWControllerFuncLibrary::GetRegisteredDevices()
+//const FGamepadKeyNames::Type EHIDInputKeys::HIDAxis1("HID Axis 1");
+
+void HIDInputLibrary::AddHIDInputKeys()
 {
-	TArray<FRegisteredDeviceInfo> RegisteredDevices;
-
-	return RegisteredDevices;
 }
-
-*/

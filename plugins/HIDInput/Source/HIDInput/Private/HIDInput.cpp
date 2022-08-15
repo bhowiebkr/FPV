@@ -5,6 +5,8 @@
 #include "IInputDeviceModule.h"
 #include "IInputDevice.h"
 
+#include "HIDInputEnum.h"
+
 #define LOCTEXT_NAMESPACE "FHIDInputPlugin"
 
 
@@ -25,6 +27,10 @@ void FHIDInputPlugin::StartupModule()
 		// Add the Handeler
 		Application->AddMessageHandler(Handler);
 	}
+
+	// Add Keys
+	EKeys::AddKey(FKeyDetails(EHIDInputKeys::HIDAxis1, LOCTEXT("HIDAxis1", "HID Axis 1"), FKeyDetails::FloatAxis));
+
 }
 
 FWindowsApplication* FHIDInputPlugin::GetApplication() const

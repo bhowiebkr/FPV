@@ -4,46 +4,32 @@
 #include "InputCoreTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GenericPlatform/GenericApplicationMessageHandler.h"
-//#include "RAWControllerFuncLibrary.generated.h"
+#include "HIDInputLibrary.generated.h"
 
-
-/*
-
-struct RAWController_API FRawControllerKeyNames
+namespace HIDInputLibrary
 {
-	static const FGamepadKeyNames::Type GenericUSBController_Axis2;
+	void AddHIDInputKeys();
 };
 
+// Look at the other 2 repos and not the RAW input one. THese is getting confusing using the
+// raw input one because there are probably hidden shit that it's looking up and unreal engine
+// documentation for c++ is total shit 
 
-struct RAWController_API FRawControllerKeys
+struct RAWINPUT_API FRawInputKeyNames
 {
-	static const FKey GenericUSBController_Axis1;
+	static const FGamepadKeyNames::Type HIDInput_Axis1;
 };
 
-
-USTRUCT(BlueprintType)
-struct RAWController_API FRegisteredDeviceInfo
+struct RAWINPUT_API FRawInputKeys
 {
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly, Category = "RawInput")
-	int32 Handle = 0;
-
-	// Driver supplied device name
-	UPROPERTY(BlueprintReadOnly, Category = "RawInput")
-	FString DeviceName;
+	static const FKey HIDInput_Axis1;
 };
-
-
 
 UCLASS()
-class RAWController_API URAWControllerFuncLibrary : public UBlueprintFunctionLibrary
+class RAWINPUT_API URawInputFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintPure, Category = "RawController")
-	static TArray<FRegisteredDeviceInfo> GetRegisteredDevices();
-};
 
-*/
+};
