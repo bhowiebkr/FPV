@@ -18,6 +18,11 @@ inline TSharedPtr<class IInputDevice> FHIDInputPlugin::CreateInputDevice(const T
 
 void FHIDInputPlugin::StartupModule()
 {
+	IInputDeviceModule::StartupModule();
+
+
+
+
 	// register our handler
 	FWindowsApplication* Application = GetApplication();
 
