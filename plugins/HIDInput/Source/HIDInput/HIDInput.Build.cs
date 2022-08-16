@@ -31,6 +31,10 @@ public class HIDInput : ModuleRules
 			new string[]
 			{
 				"Core",
+				"CoreUObject",
+				"InputCore",
+				"InputDevice",
+				"Engine"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

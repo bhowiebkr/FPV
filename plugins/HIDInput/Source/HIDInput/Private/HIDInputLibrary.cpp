@@ -1,12 +1,20 @@
 
 #include "HIDInputLibrary.h"
-#include "HIDInputEnum.h"
 
 
-//const FKey EKeysAxis1::MyoAccelerationX("Axis1");
+const FKey EKeysHIDInput::HIDAxis1("MyoAccelerationX");
 
-//const FGamepadKeyNames::Type EHIDInputKeys::HIDAxis1("HID Axis 1");
+
+
+#define LOCTEXT_NAMESPACE "HIDInput"
+
 
 void HIDInputLibrary::AddHIDInputKeys()
 {
+	EKeys::AddKey(FKeyDetails(EKeysHIDInput::HIDAxis1, LOCTEXT("HIDAxis1", "HID Axis 1"), FKeyDetails::FloatAxis));
+
 }
+
+
+#undef LOCTEXT_NAMESPACE
+
