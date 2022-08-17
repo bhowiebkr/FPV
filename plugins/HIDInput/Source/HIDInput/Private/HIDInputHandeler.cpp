@@ -53,8 +53,12 @@ bool FHIDHandeler::ProcessMessage(HWND Hwnd, uint32 Message, WPARAM WParam, LPAR
 		// If we got input, we parse it
 		if (gotInput) {
 			//GLog->Logf(TEXT("Got Input"));
+			memset(button, 0, sizeof button);
 			ParseRawInput(input, bufferSize);
 			free(input);
+			PrintRawInput();
+
+
 		}
 	}
 
@@ -73,19 +77,32 @@ void FHIDHandeler::ParseRawInput(RAWINPUT* input, UINT bufferSize)
 
 	if (gotPreparsedData)
 	{
+
+		/** From here:
+		* https://www.gamedev.net/forums/topic/708426-how-did-ms-enumerate-the-product-name-for-devicemanagers-container/5432818/
+		*/
+
+		if (false){
+			wchar_t nameBuffer[255];
+			HidD_GetManufacturerString(input->header.hDevice, nameBuffer, 127);
+			auto manufacturerLength = wcslen(nameBuffer);
+			nameBuffer[manufacturerLength++] = ' ';
+			HidD_GetProductString(input->header.hDevice, nameBuffer + manufacturerLength, ULONG(255 - manufacturerLength));
+
+			//FString DeviceName = FString::Printf(TEXT("%s "), TCHAR_TO_UTF8(nameBuffer));
+			//GEngine->AddOnScreenDebugMessage(0, 0.1f, FColor::Green, DeviceName);
+		}
+
 		HIDP_CAPS caps;
 		HidP_GetCaps(data, &caps);
 
 		//GLog->Logf(TEXT("Values: "));
 		HIDP_VALUE_CAPS* valueCaps = (HIDP_VALUE_CAPS*)malloc(caps.NumberInputValueCaps * sizeof(HIDP_VALUE_CAPS));
 		HidP_GetValueCaps(HidP_Input, valueCaps, &caps.NumberInputValueCaps, data);
-		for (USHORT i = 0; i < caps.NumberInputValueCaps; ++i)
+		//for (USHORT i = 0; i < caps.NumberInputValueCaps; ++i)
+		for (USHORT i = 0; i < sizeof(axis); ++i)
 		{
-			ULONG value;
-			HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].Range.UsageMin, &value, data, (PCHAR)input->data.hid.bRawData, input->data.hid.dwSizeHid);
-			//GLog->Logf(TEXT("%d:%5d "), i, value);
-			FString Msg = FString::Printf(TEXT("Axis: %d:%5d "), i, value);
-			GEngine->AddOnScreenDebugMessage(i, 0.1f, FColor::Red, Msg);
+			HidP_GetUsageValue(HidP_Input, valueCaps[i].UsagePage, 0, valueCaps[i].Range.UsageMin, &axis[i], data, (PCHAR)input->data.hid.bRawData, input->data.hid.dwSizeHid);
 		}
 		free(valueCaps);
 
@@ -98,14 +115,28 @@ void FHIDHandeler::ParseRawInput(RAWINPUT* input, UINT bufferSize)
 			USAGE* usages = (USAGE*)malloc(sizeof(USAGE) * usageCount);
 			HidP_GetUsages(HidP_Input, buttonCaps[i].UsagePage, 0, usages, &usageCount, data, (PCHAR)input->data.hid.bRawData, input->data.hid.dwSizeHid);
 			for (ULONG usageIndex = 0; usageIndex < usageCount; ++usageIndex) {
-				//printf("%d ", usages[usageIndex]);
-				//GLog->Logf(TEXT("%d"), usages[usageIndex]);
-				FString Msg = FString::Printf(TEXT("Button: %d "), usages[usageIndex]);
-				GEngine->AddOnScreenDebugMessage(8 + i, 0.1f, FColor::Blue, Msg);
+				button[usages[usageIndex]] = true;
 			}
 			free(usages);
 		}
 		free(buttonCaps);
 	}
 	free(data);
+}
+
+void FHIDHandeler::PrintRawInput()
+{
+	int axis_size = 8;
+
+	for (int i = 0; i < axis_size; i++) {
+		FString Msg = FString::Printf(TEXT("Axis: %d: %5d "), i, axis[i]);
+		GEngine->AddOnScreenDebugMessage(i, 0.5f, FColor::Red, Msg);
+	}
+
+	int btn_size = sizeof(button);
+	for (int i = 0; i < btn_size; i++) {
+		FString Msg = FString::Printf(TEXT("Button: %d: %s "), i, button[i]? TEXT("true"):TEXT("false"));
+		GEngine->AddOnScreenDebugMessage(i + btn_size, 0.5f, FColor::Blue, Msg);
+	}
+	
 }

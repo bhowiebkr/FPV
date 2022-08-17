@@ -58,5 +58,6 @@ protected:
 
 private:
 	FHIDHandeler Handler;
+	void bind();
 
 };

@@ -10,4 +10,6 @@
 namespace HIDInputLibrary
 {
 	void AddHIDInputKeys();
+
+	void BindAnalogForDevice(const int32 DeviceHandle, const FName KeyName, const int32 AxisIndex);
 };

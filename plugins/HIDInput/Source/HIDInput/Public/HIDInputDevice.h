@@ -21,6 +21,9 @@ public:
 	/** Poll for controller state and send events if needed */
 	virtual void SendControllerEvents() override;
 
+	void BindButtonsToHID(const int32 ButtonIndex);
+	void BindAxisToHID(const int32 AxisIndex);
+
 	void ParseEvents();
 
 	virtual ~FHIDInputDevice();

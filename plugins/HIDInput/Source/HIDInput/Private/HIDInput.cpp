@@ -34,6 +34,9 @@ void FHIDInputPlugin::StartupModule()
 
 		//Register all input mapping keys and axes
 		HIDInputLibrary::AddHIDInputKeys();
+
+
+		bind();
 	}
 
 }
@@ -49,6 +52,18 @@ FWindowsApplication* FHIDInputPlugin::GetApplication() const
 
 	GLog->Logf(TEXT("initialized"));
 	return (FWindowsApplication*)FSlateApplication::Get().GetPlatformApplication().Get();
+}
+
+void FHIDInputPlugin::bind()
+{
+	//EKeysHIDInput::HIDAxis1 = Handler.axis[0];
+
+	//TOptional<int32> UserIndex = GetUserIndexForController(ControllerId, Key);
+
+	FAnalogInputEvent AnalogInputEvent(EKeysHIDInput::HIDAxis1, FSlateApplication::Get().GetModifierKeys(), 0, false, 0, 0, Handler.axis[0]);
+	FSlateApplication::Get().ProcessAnalogInputEvent(AnalogInputEvent);
+
+
 }
 
 IMPLEMENT_MODULE(FHIDInputPlugin, RAWController)
